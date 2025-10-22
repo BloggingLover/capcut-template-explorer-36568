@@ -44,7 +44,8 @@ export interface ApiResponse {
   errmsg: string;
   data: {
     total: number;
-    video_templates: VideoTemplate[];
+    video_templates?: VideoTemplate[];
+    item_list?: VideoTemplate[];
     has_more: boolean;
   };
 }
@@ -67,6 +68,12 @@ export class ApiService {
     }
 
     const data: ApiResponse = await response.json();
+    
+    // Normalize collection API response - it uses item_list instead of video_templates
+    if (data.data?.item_list && !data.data.video_templates) {
+      data.data.video_templates = data.data.item_list;
+    }
+    
     CacheService.set(cacheKey, data);
     
     return data;
