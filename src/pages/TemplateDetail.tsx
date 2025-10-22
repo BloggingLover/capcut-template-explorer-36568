@@ -21,19 +21,33 @@ const TemplateDetail = () => {
   const findTemplate = async (webId: string) => {
     setLoading(true);
     try {
-      // Try to find in cached collections first
+      // First check if there's template data in location state (passed from search results)
+      const stateTemplate = (window.history.state?.usr as { template?: VideoTemplate })?.template;
+      if (stateTemplate && stateTemplate.web_id === webId) {
+        setTemplate(stateTemplate);
+        setLoading(false);
+        return;
+      }
+
+      // Try to find in cached collections
       for (const category of categories) {
-        const response = await ApiService.getCollectionTemplates(category.id, 200);
-        const found = response.data.video_templates.find(t => t.web_id === webId);
-        if (found) {
-          setTemplate(found);
-          setLoading(false);
-          return;
+        try {
+          const response = await ApiService.getCollectionTemplates(category.id, 200);
+          const found = response.data?.video_templates?.find(t => t.web_id === webId);
+          if (found) {
+            setTemplate(found);
+            setLoading(false);
+            return;
+          }
+        } catch (err) {
+          // Continue to next category if this one fails
+          console.warn(`Failed to load category ${category.id}:`, err);
         }
       }
       setTemplate(null);
     } catch (error) {
       console.error('Error finding template:', error);
+      setTemplate(null);
     } finally {
       setLoading(false);
     }

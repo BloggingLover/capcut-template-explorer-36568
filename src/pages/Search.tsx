@@ -26,9 +26,10 @@ const Search = () => {
     setLoading(true);
     try {
       const response = await ApiService.searchTemplates(searchTerm);
-      setTemplates(response.data.video_templates);
+      setTemplates(response.data?.video_templates || []);
     } catch (error) {
       console.error('Error searching templates:', error);
+      setTemplates([]);
     } finally {
       setLoading(false);
     }

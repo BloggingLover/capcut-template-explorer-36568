@@ -23,9 +23,10 @@ const Home = () => {
     setLoading(true);
     try {
       const response = await ApiService.getCollectionTemplates(categoryId, 200);
-      setTemplates(response.data.video_templates);
+      setTemplates(response.data?.video_templates || []);
     } catch (error) {
       console.error('Error loading templates:', error);
+      setTemplates([]);
     } finally {
       setLoading(false);
     }

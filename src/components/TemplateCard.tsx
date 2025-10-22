@@ -66,6 +66,7 @@ export const TemplateCard = ({ template }: TemplateCardProps) => {
   return (
     <Link 
       to={`/template/${template.web_id}`}
+      state={{ template }}
       className="group block"
     >
       <div 

@@ -81,16 +81,9 @@ export class ApiService {
       return cached;
     }
 
-    const response = await fetch(SEARCH_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query,
-        count: 100,
-        cursor: 0,
-      }),
+    const url = `${SEARCH_API_URL}?query=${encodeURIComponent(query)}&count=100&cursor=0`;
+    const response = await fetch(url, {
+      method: 'GET',
     });
 
     if (!response.ok) {
@@ -98,6 +91,21 @@ export class ApiService {
     }
 
     const data: ApiResponse = await response.json();
+    
+    // Ensure data structure is valid
+    if (!data.data || !data.data.video_templates) {
+      console.error('Invalid response structure:', data);
+      return {
+        ret: 'error',
+        errmsg: 'Invalid response structure',
+        data: {
+          total: 0,
+          video_templates: [],
+          has_more: false,
+        },
+      };
+    }
+    
     CacheService.set(cacheKey, data);
     
     return data;
