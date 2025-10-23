@@ -1,0 +1,88 @@
+CapCut Template Explorer — Build, Test, and AdMob Guide
+
+IMPORTANT: Fix the crash (Invalid App ID)
+- We set a valid App ID in capacitor.config.ts: com.capcut.templateexplorer
+- If you previously created/added Android with a different ID (e.g., com.example.app), do this clean reset:
+  1) Delete the android/ folder
+  2) npm install
+  3) npm run build
+  4) npx cap add android
+  5) npx cap sync android
+  6) Build and install again
+
+Build an Android APK (Debug)
+1) npm install
+2) npm run build  (creates dist)
+3) npx cap sync android
+4) cd android
+5) ./gradlew assembleDebug
+6) APK path: android/app/build/outputs/apk/debug/app-debug.apk
+
+Run on Android device/emulator from VS Code terminal
+- Ensure an emulator is running or a device is connected with USB debugging.
+- Commands (from project root):
+  npm run build
+  npx cap sync android
+  npx cap run android
+
+iOS (optional, on a Mac)
+1) npm install && npm run build
+2) npx cap add ios (first time only)
+3) npx cap sync ios
+4) npx cap run ios  (or open ios/App.xcworkspace in Xcode and press Run)
+
+Critical config for APKs (no remote server)
+- In capacitor.config.ts, keep server section commented out so the app loads local files from dist in APK builds.
+- webDir stays "dist".
+
+AdMob in this app (uses Google TEST IDs)
+- Files:
+  - src/services/admob.ts (initialization + banner/interstitial/rewarded helpers)
+  - src/components/BannerAd.tsx (adaptive banner)
+  - src/components/NativeAd.tsx (placeholder card)
+  - Pages using ads: src/pages/Home.tsx, src/pages/Search.tsx, src/pages/TemplateDetail.tsx
+- What you’ll see:
+  - Banners: Adaptive banners appear randomly after every 3–4 template grids (Home/Search)
+  - Interstitial: Shown while a search is running in background (Search)
+  - Rewarded: "Watch Ad to Unlock" on Template Detail unlocks the action button after viewing
+  - Native: Placeholder card at bottom of Template Detail
+- Real ads for production:
+  1) Replace test IDs in src/services/admob.ts with your real ad unit IDs
+  2) In capacitor.config.ts, remove initializeForTesting (plugins.AdMob)
+  3) Rebuild + npx cap sync
+
+Cache system (10 minutes)
+- Caches templates and searches for 10 minutes for faster reloads and limited offline use.
+- Code: src/services/cache.ts (CACHE_DURATION = 10 * 60 * 1000)
+- Integrated in src/services/api.ts
+
+Back navigation (Android/iOS)
+- Hardware back behaves like in-app back; on Home it minimizes instead of closing.
+- Code: src/hooks/useBackButton.ts (used by pages)
+
+Common issues and fixes
+- App closes on tap after install:
+  - Ensure capacitor.config.ts has a valid appId (com.capcut.templateexplorer) and NO active server.url
+  - Run npm run build then npx cap sync android before building APK
+  - If you changed appId, uninstall old app from device before installing the new one
+  - If you re-initialized with a different app name/ID, delete android/ and re-add (npx cap add android)
+- Android Studio shows "AGP 8.7.2 incompatible":
+  - Either update Android Studio to latest or build via CLI (./gradlew assembleDebug). It’s a Studio compatibility warning, not a blocker for CLI builds.
+- No ads on web preview:
+  - AdMob test ads only show on real devices. Use an Android device build for testing.
+- Blank screen:
+  - Make sure dist exists (npm run build) and you synced (npx cap sync android)
+
+Quick rebuild checklist (Android)
+1) npm run build
+2) npx cap sync android
+3) cd android && ./gradlew assembleDebug
+4) Install the APK and test on device
+
+Where to change things
+- App ID/Name: capacitor.config.ts
+- Ad IDs / behavior: src/services/admob.ts (+ usage in pages/components)
+- Cache duration: src/services/cache.ts
+- Back button behavior: src/hooks/useBackButton.ts
+
+That’s it! Follow the steps above and you’ll have a working APK with caching, consistent back navigation, and AdMob test ads.

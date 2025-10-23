@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.6be872e2eea847c59592a15bdaa575b7',
+  appId: 'com.capcut.templateexplorer',
   appName: 'CapCut Template Explorer',
   webDir: 'dist',
   // IMPORTANT: Comment out 'server' section for production APK builds
