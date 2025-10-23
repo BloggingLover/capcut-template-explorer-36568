@@ -4,11 +4,8 @@ import { ArrowLeft, Search as SearchIcon } from "lucide-react";
 import { ApiService, VideoTemplate } from "@/services/api";
 import { TemplateCard } from "@/components/TemplateCard";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { BannerAd } from "@/components/BannerAd";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useBackButton } from "@/hooks/useBackButton";
-import { adMobService } from "@/services/admob";
 
 const Search = () => {
   const [searchParams] = useSearchParams();
@@ -17,9 +14,6 @@ const Search = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const query = searchParams.get('q') || '';
-  
-  // Handle hardware back button
-  useBackButton();
 
   useEffect(() => {
     if (query) {
@@ -30,10 +24,6 @@ const Search = () => {
 
   const searchTemplates = async (searchTerm: string) => {
     setLoading(true);
-    
-    // Show interstitial ad while search is running
-    adMobService.showInterstitial();
-    
     try {
       const response = await ApiService.searchTemplates(searchTerm);
       setTemplates(response.data?.video_templates || []);
@@ -110,16 +100,8 @@ const Search = () => {
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {templates.map((template, index) => (
-                <>
-                  <TemplateCard key={template.web_id} template={template} />
-                  {/* Show banner ad randomly after every 3-4 templates */}
-                  {(index + 1) % (Math.random() > 0.5 ? 3 : 4) === 0 && (
-                    <div className="col-span-full">
-                      <BannerAd />
-                    </div>
-                  )}
-                </>
+              {templates.map((template) => (
+                <TemplateCard key={template.web_id} template={template} />
               ))}
             </div>
           </>

@@ -5,10 +5,8 @@ import { ApiService, categories, VideoTemplate } from "@/services/api";
 import { TemplateCard } from "@/components/TemplateCard";
 import { CategoryChip } from "@/components/CategoryChip";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { BannerAd } from "@/components/BannerAd";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useBackButton } from "@/hooks/useBackButton";
 
 const Home = () => {
   const [templates, setTemplates] = useState<VideoTemplate[]>([]);
@@ -16,9 +14,6 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(6001);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  
-  // Handle hardware back button
-  useBackButton();
 
   useEffect(() => {
     loadTemplates(selectedCategory);
@@ -107,16 +102,8 @@ const Home = () => {
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {templates.map((template, index) => (
-                <>
-                  <TemplateCard key={template.web_id} template={template} />
-                  {/* Show banner ad randomly after every 3-4 templates */}
-                  {(index + 1) % (Math.random() > 0.5 ? 3 : 4) === 0 && (
-                    <div className="col-span-full">
-                      <BannerAd />
-                    </div>
-                  )}
-                </>
+              {templates.map((template) => (
+                <TemplateCard key={template.web_id} template={template} />
               ))}
             </div>
           </>
