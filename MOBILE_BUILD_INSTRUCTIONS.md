@@ -1,5 +1,16 @@
 # Mobile Build Instructions for Android & iOS
 
+## 🚨 CRITICAL: Capacitor Config for APK Builds
+
+**IMPORTANT:** The `capacitor.config.ts` file has the `server` section **COMMENTED OUT**. This is REQUIRED for APK builds to work!
+
+- ✅ **Server section commented** = App loads from local files → Works on device
+- ❌ **Server section active** = App tries to load from remote URL → **CRASHES on device**
+
+For detailed build instructions, see: **HOW_TO_BUILD_APK.txt**
+
+---
+
 ## ✅ Completed Features
 
 ### 1. **Cache System (10 minutes)**
