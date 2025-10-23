@@ -3,14 +3,23 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Users, FileText, ExternalLink, Smartphone } from "lucide-react";
 import { ApiService, VideoTemplate, categories } from "@/services/api";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { NativeAd } from "@/components/NativeAd";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useBackButton } from "@/hooks/useBackButton";
+import { adMobService } from "@/services/admob";
+import { useToast } from "@/hooks/use-toast";
 
 const TemplateDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [template, setTemplate] = useState<VideoTemplate | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  
+  // Handle hardware back button
+  useBackButton();
 
   useEffect(() => {
     if (id) {
@@ -85,6 +94,23 @@ const TemplateDetail = () => {
 
   const capcutAppUrl = `https://www.capcut.com/t/${template.web_id}`;
   const capcutWebUrl = `https://www.capcut.com/template-detail/${template.web_id}`;
+
+  const handleWatchAdToUnlock = async () => {
+    const rewarded = await adMobService.showRewarded();
+    if (rewarded) {
+      setIsUnlocked(true);
+      toast({
+        title: "Button Unlocked!",
+        description: "You can now use the template in CapCut app.",
+      });
+    } else {
+      toast({
+        title: "Ad not completed",
+        description: "Please watch the full ad to unlock.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -165,20 +191,31 @@ const TemplateDetail = () => {
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <a
-                href={capcutAppUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full"
-              >
+              {isUnlocked ? (
+                <a
+                  href={capcutAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                >
+                  <Button
+                    size="lg"
+                    className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
+                  >
+                    <Smartphone className="w-5 h-5 mr-2" />
+                    Use Template in CapCut App
+                  </Button>
+                </a>
+              ) : (
                 <Button
                   size="lg"
+                  onClick={handleWatchAdToUnlock}
                   className="w-full bg-gradient-primary hover:opacity-90 transition-opacity"
                 >
                   <Smartphone className="w-5 h-5 mr-2" />
-                  Use Template in CapCut App
+                  Watch Ad to Unlock
                 </Button>
-              </a>
+              )}
               <a
                 href={capcutWebUrl}
                 target="_blank"
@@ -194,6 +231,11 @@ const TemplateDetail = () => {
                   Open in CapCut Web
                 </Button>
               </a>
+            </div>
+            
+            {/* Native Ad at bottom */}
+            <div className="pt-6">
+              <NativeAd />
             </div>
           </div>
         </div>

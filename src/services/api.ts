@@ -1,3 +1,5 @@
+import { CacheService } from './cache';
+
 const SEARCH_API_URL = 'https://cc-search.onrender.com/';
 const COLLECTION_API_BASE_URL = 'https://cc-list.onrender.com/get_collection_templates?id=';
 
@@ -50,6 +52,14 @@ export interface ApiResponse {
 
 export class ApiService {
   static async getCollectionTemplates(collectionId: number, count: number = 200): Promise<ApiResponse> {
+    const cacheKey = `collection_${collectionId}_${count}`;
+    
+    // Try to get from cache first
+    const cached = CacheService.get<ApiResponse>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const url = `${COLLECTION_API_BASE_URL}${collectionId}&count=${count}`;
     const response = await fetch(url);
     
@@ -64,10 +74,21 @@ export class ApiService {
       data.data.video_templates = data.data.item_list;
     }
     
+    // Cache the result
+    CacheService.set(cacheKey, data);
+    
     return data;
   }
 
   static async searchTemplates(query: string): Promise<ApiResponse> {
+    const cacheKey = `search_${query}`;
+    
+    // Try to get from cache first
+    const cached = CacheService.get<ApiResponse>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const url = `${SEARCH_API_URL}?search=${encodeURIComponent(query)}`;
     const response = await fetch(url, {
       method: 'GET',
@@ -92,6 +113,9 @@ export class ApiService {
         },
       };
     }
+    
+    // Cache the result
+    CacheService.set(cacheKey, data);
     
     return data;
   }

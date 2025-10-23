@@ -7,6 +7,12 @@ const config: CapacitorConfig = {
   server: {
     url: 'https://6be872e2-eea8-47c5-9592-a15bdaa575b7.lovableproject.com?forceHideBadge=true',
     cleartext: true
+  },
+  plugins: {
+    AdMob: {
+      testingDevices: [],
+      initializeForTesting: true
+    }
   }
 };
 

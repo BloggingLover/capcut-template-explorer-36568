@@ -1,4 +1,4 @@
-const CACHE_DURATION = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 interface CacheItem<T> {
   data: T;
